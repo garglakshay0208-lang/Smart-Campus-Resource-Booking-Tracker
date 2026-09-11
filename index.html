@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CampusFlow — Smart Campus Resource Booking Platform</title>
+  <meta name="description" content="One campus. One calendar. Zero double bookings. Reserve labs, seminar halls, and campus resources with real-time AWS DynamoDB conflict prevention.">
+
+  <!-- Google Fonts: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Application Stylesheets -->
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/landing.css">
+  <link rel="stylesheet" href="styles/dashboard.css">
+  <link rel="stylesheet" href="styles/modal.css">
+
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23080C14'/><path d='M8 12h16M8 18h16M14 6v6M20 6v6' stroke='%23FF9900' stroke-width='2.5' stroke-linecap='round'/></svg>">
+</head>
+<body>
+
+  <!-- =========================================================================
+       1. PUBLIC LANDING PAGE (SaaS Presentation Mode)
+       ========================================================================= -->
+  <div id="view-landing">
+    
+    <!-- Public Navigation Bar -->
+    <nav class="landing-nav" aria-label="Main Navigation">
+      <div class="container nav-container">
+        <a href="#view-landing" class="brand-logo" aria-label="CampusFlow Home">
+          <!-- Custom Geometric SVG Logo: Schedule Grid + Flow Ribbon -->
+          <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="36" height="36" rx="10" fill="#0E1726" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+            <rect x="7" y="10" width="22" height="18" rx="4" stroke="#94A3B8" stroke-width="2"/>
+            <path d="M12 7V11" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M24 7V11" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M7 16H29" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+            <!-- Subtle flow curve connector -->
+            <path d="M12 22C15 22 17 24 20 24C23 24 24 21 24 21" stroke="#FF9900" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="24" cy="21" r="2" fill="#FF9900"/>
+          </svg>
+          <span>CampusFlow</span>
+        </a>
+
+        <ul class="nav-links">
+          <li><a href="#product" class="nav-link">Product</a></li>
+          <li><a href="#how-it-works" class="nav-link">How it works</a></li>
+          <li><a href="#aws-architecture" class="nav-link">AWS Architecture</a></li>
+          <li><a href="#features" class="nav-link">Features</a></li>
+        </ul>
+
+        <div class="nav-actions">
+          <!-- Theme Toggle Button -->
+          <button class="theme-toggle-btn btn-theme-toggle" aria-label="Toggle Theme" title="Toggle Light / Dark Mode">
+            <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+          <button class="btn btn-ghost btn-sm btn-enter-app" aria-label="Sign In">Sign In</button>
+          <button class="btn btn-primary btn-sm btn-enter-app" id="btn-nav-book">Book a Resource</button>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <!-- HERO SECTION -->
+      <section class="hero-section" id="product">
+        <div class="container hero-grid">
+          <div class="hero-content">
+            <div class="badge badge-aws hero-badge">
+              <span class="status-dot available"></span>
+              SMART CAMPUS RESOURCE MANAGEMENT
+            </div>
+
+            <h1 class="hero-headline">
+              Reserve campus resources <span class="text-gradient-orange">without the chaos.</span>
+            </h1>
+
+            <p class="hero-subtext">
+              CampusFlow gives students and staff one reliable place to discover availability, reserve resources, and eliminate double bookings.
+            </p>
+
+            <div class="hero-cta-group">
+              <button class="btn btn-primary btn-lg btn-enter-app" id="btn-hero-book">
+                Book a Resource
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+              <button class="btn btn-secondary btn-lg btn-enter-app btn-explore-timeline">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9900" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Explore Availability
+              </button>
+            </div>
+
+            <div class="hero-trust-bar">
+              <div class="trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Zero double bookings guaranteed</span>
+              </div>
+              <div class="trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>AWS DynamoDB Atomic Locks</span>
+              </div>
+              <div class="trust-item">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span>Real-time Timeline</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- HERO VISUAL: Floating Live Dashboard Preview -->
+          <div class="hero-visual-wrapper">
+            <div class="hero-visual-card" role="region" aria-label="Interactive Preview Card">
+              <div class="hero-card-header">
+                <div>
+                  <h3 class="hero-card-title">Innovation Lab</h3>
+                  <div class="hero-card-subtitle">
+                    <span>Block A · 2nd Floor</span>
+                  </div>
+                </div>
+                <div class="hero-live-badge">
+                  <span class="status-dot available"></span>
+                  Available now
+                </div>
+              </div>
+
+              <!-- Miniature Schedule with subtle animated timeline -->
+              <div class="hero-mini-schedule" title="Click to open live schedule in App">
+                <div class="hero-schedule-heading">
+                  <span>Today's Schedule</span>
+                  <span style="color: var(--accent-aws);">Friday, Sep 11</span>
+                </div>
+
+                <div class="hero-schedule-item">
+                  <span class="hero-schedule-time">09:00 — 10:30</span>
+                  <span class="hero-schedule-event">Robotics Club</span>
+                  <span class="badge badge-booked">Booked</span>
+                </div>
+
+                <div class="hero-schedule-item">
+                  <span class="hero-schedule-time">11:00 — 12:00</span>
+                  <span class="hero-schedule-event">Design Team</span>
+                  <span class="badge badge-booked">Booked</span>
+                </div>
+
+                <div class="hero-schedule-item">
+                  <span class="hero-schedule-time">14:00 — 16:00</span>
+                  <span class="hero-schedule-event">AI Society</span>
+                  <span class="badge badge-booked">Booked</span>
+                </div>
+
+                <div class="hero-schedule-item">
+                  <span class="hero-schedule-time">17:00 — 18:30</span>
+                  <span class="hero-schedule-event">Innovation Cell</span>
+                  <span class="badge badge-booked">Booked</span>
+                </div>
+
+                <div style="margin-top: 10px; display: flex; align-items: center; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted);">
+                  <span>✨ 4 Open Gaps Available</span>
+                  <span style="color: var(--accent-aws); font-weight: 600; cursor: pointer;">Launch Live Timeline →</span>
+                </div>
+              </div>
+
+              <!-- Floating Metric Badge -->
+              <div class="hero-floating-stat">
+                <div class="hero-floating-stat-num">0%</div>
+                <div class="hero-floating-stat-label">
+                  <strong>Conflict Rate</strong><br>
+                  Multi-tenant scale
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. PROBLEM SECTION -->
+      <section class="section-problem" id="how-it-works">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-subtitle-tag">The Campus Chaos</span>
+            <h2 class="section-title">Campus resources shouldn't be booked in chat.</h2>
+            <p class="section-desc">
+              When student societies and faculty coordinate specialized rooms through unstructured WhatsApp groups and emails, clashes are inevitable.
+            </p>
+          </div>
+
+          <!-- 4 Problem Cards -->
+          <div class="problem-cards-grid">
+            <div class="problem-card">
+              <div class="problem-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+              </div>
+              <h3 class="problem-card-title">Double Bookings</h3>
+              <p class="problem-card-desc">Two teams accidentally reserve the same resource at the same hour, ruining workshops and guest presentations.</p>
+            </div>
+
+            <div class="problem-card">
+              <div class="problem-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+              </div>
+              <h3 class="problem-card-title">Hidden Availability</h3>
+              <p class="problem-card-desc">Nobody knows whether the room is actually free or reserved off-the-record, leaving expensive facilities underutilized.</p>
+            </div>
+
+            <div class="problem-card">
+              <div class="problem-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              </div>
+              <h3 class="problem-card-title">Scattered Communication</h3>
+              <p class="problem-card-desc">Bookings disappear inside WhatsApp and group chats where timestamps are disputed and admins get overwhelmed.</p>
+            </div>
+
+            <div class="problem-card">
+              <div class="problem-card-icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              </div>
+              <h3 class="problem-card-title">No Central Record</h3>
+              <p class="problem-card-desc">There is no reliable booking history for department heads, audit tracking, or campus equipment accountability.</p>
+            </div>
+          </div>
+
+          <!-- Problem Comparison Visual: Chat messages -> confusion -> CampusFlow -->
+          <div class="problem-comparison-box">
+            <!-- Left: Chaotic Chat Mockup -->
+            <div class="chat-chaos-panel">
+              <div style="font-size: 0.75rem; font-weight: 700; color: #FCA5A5; text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; justify-content: space-between;">
+                <span>WhatsApp Group · "Campus Tech Heads"</span>
+                <span>🔴 Unverified</span>
+              </div>
+              <div class="chat-bubble them">
+                Can the Robotics Club use the Innovation Lab from 2:00 to 4:00 PM today?
+              </div>
+              <div class="chat-bubble them">
+                Wait, didn't AI Society book it yesterday in the other chat?
+              </div>
+              <div class="chat-bubble you">
+                We already have 30 people traveling here right now! Who approved this??
+              </div>
+              <div class="chat-conflict-alert">
+                ⚠️ Conflict: 2 societies arrived at the same door simultaneously.
+              </div>
+            </div>
+
+            <!-- Transition Arrow -->
+            <div class="comparison-divider">
+              <div class="comparison-arrow">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </div>
+              <span>TRANSFORMS TO</span>
+            </div>
+
+            <!-- Right: CampusFlow Single Source of Truth -->
+            <div class="truth-panel">
+              <div class="truth-badge">
+                <span>CampusFlow · Verified Ledger</span>
+                <span>🟢 100% Conflict-Free</span>
+              </div>
+              <div class="truth-item">
+                <span>14:00–16:00 Innovation Lab</span>
+                <span class="badge badge-aws">Locked: AI Society</span>
+              </div>
+              <div class="truth-item">
+                <span>Robotics Club alternative</span>
+                <span class="badge badge-available">Auto-shifted: 16:00</span>
+              </div>
+              <div style="font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.4; padding: 4px 0;">
+                All keys synchronized via DynamoDB conditional checks. Both societies have confirmed time, entry QR, and peace of mind.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. SOLUTION SECTION -->
+      <section class="section-solution" id="features">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-subtitle-tag">The Frictionless Flow</span>
+            <h2 class="section-title">From confusion to one clear schedule.</h2>
+            <p class="section-desc">
+              CampusFlow standardizes the entire reservation lifecycle into four lightning-fast steps.
+            </p>
+          </div>
+
+          <div class="solution-steps-grid">
+            <div class="solution-step-card">
+              <span class="step-num">01</span>
+              <h3 class="step-title">Discover</h3>
+              <p class="step-desc">Find the resource you need with real-time specs, seating capacity, equipment details, and location maps.</p>
+            </div>
+
+            <div class="solution-step-card">
+              <span class="step-num">02</span>
+              <h3 class="step-title">Check</h3>
+              <p class="step-desc">See real-time availability on an intuitive 8 AM to 8 PM interactive timeline with zero guesswork.</p>
+            </div>
+
+            <div class="solution-step-card">
+              <span class="step-num">03</span>
+              <h3 class="step-title">Reserve</h3>
+              <p class="step-desc">Select an available time slot with automatic overlap prevention and smart alternative recommendations.</p>
+            </div>
+
+            <div class="solution-step-card">
+              <span class="step-num">04</span>
+              <h3 class="step-title">Confirm</h3>
+              <p class="step-desc">Get an instant booking confirmation, calendar sync, and QR access code validated by AWS Cloud.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- AWS ARCHITECTURE STORY & INTERACTIVE SIMULATOR -->
+      <section class="section-aws" id="aws-architecture">
+        <div class="container">
+          <div class="aws-arch-showcase">
+            <div class="aws-arch-header">
+              <div>
+                <span class="section-subtitle-tag">Cloud-Native Reliability</span>
+                <h2 style="font-size: 2.25rem; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px;">
+                  Enterprise-grade scale powered by AWS.
+                </h2>
+                <p style="color: var(--text-secondary); max-width: 600px; font-size: 1rem;">
+                  Zero double bookings mathematically enforced by Amazon DynamoDB atomic conditional writes (<code style="color: var(--accent-aws); font-family: var(--font-mono);">ConditionExpression: attribute_not_exists</code>).
+                </p>
+              </div>
+              <div class="badge badge-aws" style="padding: 8px 16px; font-size: 0.8125rem;">
+                AWS ap-south-1 • 99.99% Availability
+              </div>
+            </div>
+
+            <!-- AWS Topology Nodes -->
+            <div class="aws-cloud-nodes-grid">
+              <div class="aws-node-card">
+                <div class="aws-node-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+                </div>
+                <h4 class="aws-node-title">Amazon CloudFront & S3</h4>
+                <div class="aws-node-tech">Edge CDN Delivery</div>
+                <p class="aws-node-desc">Sub-25ms global asset delivery, caching availability schedules at edge locations closest to campus users.</p>
+              </div>
+
+              <div class="aws-node-card">
+                <div class="aws-node-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <h4 class="aws-node-title">AWS Lambda</h4>
+                <div class="aws-node-tech">Serverless Compute</div>
+                <p class="aws-node-desc">Lightweight microservices for conflict validation, smart alternative generation, and instant schedule mutation.</p>
+              </div>
+
+              <div class="aws-node-card">
+                <div class="aws-node-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </div>
+                <h4 class="aws-node-title">Amazon DynamoDB</h4>
+                <div class="aws-node-tech">Atomic Lock Store</div>
+                <p class="aws-node-desc">Single-table design utilizing strict conditional write expressions ensuring concurrency protection under peak loads.</p>
+              </div>
+
+              <div class="aws-node-card">
+                <div class="aws-node-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                </div>
+                <h4 class="aws-node-title">Amazon EventBridge & SNS</h4>
+                <div class="aws-node-tech">Campus Notifications</div>
+                <p class="aws-node-desc">Decoupled pub/sub triggers SMS/email confirmations, check-in QR reminders, and automated calendar updates.</p>
+              </div>
+
+              <div class="aws-node-card">
+                <div class="aws-node-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <h4 class="aws-node-title">AWS Cognito</h4>
+                <div class="aws-node-tech">Identity & Access</div>
+                <p class="aws-node-desc">Fine-grained IAM federation supporting university single sign-on (SSO), distinguishing faculty privileges from students.</p>
+              </div>
+
+              <div class="aws-node-card">
+                <div class="aws-node-icon">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
+                </div>
+                <h4 class="aws-node-title">Amazon CloudWatch</h4>
+                <div class="aws-node-tech">Observability & Metrics</div>
+                <p class="aws-node-desc">Real-time telemetry tracking facility utilization rates, peak hours, and room capacity saturation across departments.</p>
+              </div>
+            </div>
+
+            <!-- Interactive DynamoDB Race-Condition Simulator -->
+            <div class="dynamodb-simulator">
+              <div class="simulator-header">
+                <div>
+                  <strong style="color: var(--text-primary); font-size: 0.9375rem;">Live AWS Concurrency Test Bench</strong>
+                  <div style="font-size: 0.75rem; color: var(--text-secondary);">Test how DynamoDB handles two simultaneous booking requests for the exact same slot.</div>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-run-dynamo-sim">
+                  ⚡ Simulate Concurrent Requests
+                </button>
+              </div>
+
+              <div class="code-terminal" id="dynamo-sim-output">
+<span class="terminal-accent">> AWS DynamoDB ConditionCheck Terminal Ready</span>
+[SYSTEM] Awaiting simulated reservation attempt...
+[STATUS] Ready to execute TransactWriteItems with atomic validation.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA BANNER -->
+      <section class="landing-cta-banner">
+        <div class="container">
+          <div class="cta-banner-content">
+            <h2 class="cta-banner-title">Ready to bring order to your campus schedule?</h2>
+            <p style="color: var(--text-secondary); max-width: 500px; font-size: 1.125rem;">
+              Experience the working live demo right now with real-time conflict detection and instant calendar sync.
+            </p>
+            <button class="btn btn-primary btn-lg btn-enter-app">
+              Enter CampusFlow Workspace →
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+      <div class="container footer-container">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <strong style="color: var(--text-primary);">CampusFlow</strong>
+          <span>— One campus. One calendar. Zero double bookings.</span>
+        </div>
+        <div class="footer-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Competition-Ready Demo Build</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+
+  <!-- =========================================================================
+       2. MAIN APP DASHBOARD (The Primary Interactive Application)
+       ========================================================================= -->
+  <div id="view-dashboard" class="app-layout" style="display: none;">
+    
+    <!-- APP SIDEBAR -->
+    <aside class="app-sidebar" aria-label="Dashboard Sidebar">
+      <div class="sidebar-top">
+        <!-- Sidebar Logo -->
+        <div class="sidebar-brand">
+          <a href="#" class="brand-logo btn-return-landing" title="Click to view Landing Page">
+            <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect width="36" height="36" rx="10" fill="#0E1726" stroke="rgba(255,255,255,0.12)" stroke-width="1.5"/>
+              <rect x="7" y="10" width="22" height="18" rx="4" stroke="#94A3B8" stroke-width="2"/>
+              <path d="M12 7V11" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M24 7V11" stroke="#FF9900" stroke-width="2.5" stroke-linecap="round"/>
+              <path d="M7 16H29" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+              <path d="M12 22C15 22 17 24 20 24C23 24 24 21 24 21" stroke="#FF9900" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="24" cy="21" r="2" fill="#FF9900"/>
+            </svg>
+            <span class="brand-text">CampusFlow</span>
+          </a>
+        </div>
+
+        <!-- Navigation Menu -->
+        <nav class="sidebar-nav">
+          <a href="#" class="sidebar-nav-item active" data-tab="overview">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Overview</span>
+          </a>
+
+          <a href="#" class="sidebar-nav-item" data-tab="availability">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            <span>Availability</span>
+          </a>
+
+          <a href="#" class="sidebar-nav-item" data-tab="calendar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <span>Calendar</span>
+          </a>
+
+          <a href="#" class="sidebar-nav-item" data-tab="bookings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            <span>My Bookings</span>
+            <span class="nav-badge" id="sidebar-bookings-badge">1</span>
+          </a>
+
+          <a href="#" class="sidebar-nav-item" data-tab="architecture">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            <span>AWS Architecture</span>
+          </a>
+
+          <a href="#" class="sidebar-nav-item" data-tab="activity">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Activity</span>
+          </a>
+
+          <a href="#" class="sidebar-nav-item" data-tab="settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            <span>Settings</span>
+          </a>
+        </nav>
+
+        <!-- Sidebar AWS Cloud Status Badge -->
+        <div class="sidebar-aws-status">
+          <div class="aws-cloud-dot"></div>
+          <span><strong>AWS ap-south-1</strong> • Connected</span>
+        </div>
+      </div>
+
+      <!-- Bottom User Profile: Lakshay Garg, Student -->
+      <div class="sidebar-bottom">
+        <div class="sidebar-user">
+          <div class="user-avatar" aria-hidden="true">LG</div>
+          <div class="user-info">
+            <span class="user-name">Lakshay Garg</span>
+            <span class="user-role">Student · CS & AI</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN APP WORKSPACE -->
+    <main class="app-main">
+      
+      <!-- 7. DASHBOARD HEADER -->
+      <header class="dashboard-header">
+        <div>
+          <div style="display: flex; align-items: center; flex-wrap: wrap;">
+            <h1 class="header-greeting-title">Good morning, Lakshay 👋</h1>
+            <span class="header-date-badge">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              Friday, September 11, 2026
+            </span>
+          </div>
+          <p class="header-subtitle">Here's what's happening across your campus resources.</p>
+        </div>
+
+        <div class="dashboard-header-actions">
+          <!-- Theme Toggle Button -->
+          <button class="header-action-btn btn-theme-toggle" aria-label="Toggle Theme" title="Toggle Light / Dark Mode">
+            <svg class="theme-icon-sun" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+            <svg class="theme-icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          </button>
+
+          <!-- Switch back to Landing Page -->
+          <button class="btn btn-secondary btn-sm btn-return-landing" title="View Public Landing Page">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            Landing Page
+          </button>
+
+          <!-- Notification Bell -->
+          <button class="header-action-btn" id="btn-notifications-toggle" aria-label="Notifications">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+            <span class="notification-badge"></span>
+          </button>
+
+          <!-- Reset Demo State Button -->
+          <button class="btn btn-secondary btn-sm" id="btn-reset-demo" title="Reset Demo Data">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
+            Reset Seed
+          </button>
+        </div>
+      </header>
+
+      <!-- TAB VIEW 1: OVERVIEW (Default Main Screen) -->
+      <div id="tab-section-overview" class="dashboard-view-section active">
+        
+        <!-- 8. KPI CARDS (4 Cards) -->
+        <section class="kpi-cards-grid" aria-label="Metrics Overview">
+          <!-- KPI 1: Available Now -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Available Now</span>
+              <div class="kpi-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-available-num">1</span>
+            </div>
+            <div class="kpi-detail">
+              <span class="status-dot available"></span>
+              <span id="kpi-available-lab">Innovation Lab</span>
+              <span style="color: var(--status-available); font-weight: 600;">· Available</span>
+            </div>
+          </div>
+
+          <!-- KPI 2: Today's Bookings -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Today's Bookings</span>
+              <div class="kpi-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF9900" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-today-count">8</span>
+            </div>
+            <div class="kpi-detail">
+              <span>Across campus facilities</span>
+            </div>
+          </div>
+
+          <!-- KPI 3: My Upcoming -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">My Upcoming</span>
+              <div class="kpi-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38BDF8" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value" id="kpi-my-upcoming">3</span>
+            </div>
+            <div class="kpi-detail">
+              <span class="badge badge-aws" style="padding: 2px 8px; font-size: 0.6875rem;" id="kpi-my-next">Next: 2:00 PM</span>
+            </div>
+          </div>
+
+          <!-- KPI 4: Utilization -->
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Utilization</span>
+              <div class="kpi-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#A855F7" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+              </div>
+            </div>
+            <div class="kpi-value-row">
+              <span class="kpi-value">72%</span>
+            </div>
+            <div class="kpi-detail">
+              <span class="kpi-trend-up">↑ 8.4%</span>
+              <span>this week</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. RESOURCE HERO CARD -->
+        <section class="resource-hero-card" aria-label="Featured Campus Resource">
+          <div class="resource-hero-top">
+            <div class="resource-hero-title-group">
+              <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 4px;">
+                <h2 class="resource-hero-title" id="hero-card-name">Innovation Lab</h2>
+                <span class="badge badge-available">
+                  <span class="status-dot available"></span>
+                  Available now
+                </span>
+              </div>
+              <div class="resource-meta-row">
+                <div class="meta-item">
+                  <span>📍</span>
+                  <span id="hero-card-location">Block A · 2nd Floor</span>
+                </div>
+                <div class="meta-item">
+                  <span>👥</span>
+                  <span id="hero-card-capacity">Capacity 40</span>
+                </div>
+                <div class="meta-item">
+                  <span>🕐</span>
+                  <span id="hero-card-hours">8:00 AM – 8:00 PM</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Resource Switcher Controls -->
+            <div style="display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+              <button class="btn btn-ghost btn-sm resource-switch-btn active" data-resource-id="innovation-lab">Innovation Lab</button>
+              <button class="btn btn-ghost btn-sm resource-switch-btn" data-resource-id="robotics-arena">Robotics Arena</button>
+              <button class="btn btn-ghost btn-sm resource-switch-btn" data-resource-id="seminar-hall-b">Seminar Hall B</button>
+            </div>
+          </div>
+
+          <!-- Equipment Tags -->
+          <div class="resource-equipment-list">
+            <span class="equipment-label">Equipment:</span>
+            <div id="hero-card-equipment" style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <span class="equipment-pill">3D Printers</span>
+              <span class="equipment-pill">IoT Kits</span>
+              <span class="equipment-pill">Workstations</span>
+              <span class="equipment-pill">Projector</span>
+            </div>
+          </div>
+
+          <!-- Hero Card Action Buttons -->
+          <div class="resource-actions">
+            <button class="btn btn-primary btn-md" id="btn-hero-book-now">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Book Now
+            </button>
+            <button class="btn btn-secondary btn-md" id="btn-hero-view-schedule">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+              View Schedule
+            </button>
+          </div>
+        </section>
+
+        <!-- 10. AVAILABILITY TIMELINE (Signature Component) -->
+        <section class="timeline-section-card" aria-label="Signature Availability Timeline">
+          <div class="timeline-header">
+            <div class="timeline-title-group">
+              <h2>Today's availability</h2>
+              <p>Friday, September 11 · Interactive 8:00 AM – 8:00 PM Schedule</p>
+            </div>
+
+            <!-- Timeline Legend -->
+            <div class="timeline-legend">
+              <div class="legend-item">
+                <span class="status-dot available"></span>
+                <span>Available (Click to reserve)</span>
+              </div>
+              <div class="legend-item">
+                <span class="status-dot booked"></span>
+                <span>Booked</span>
+              </div>
+              <div class="legend-item">
+                <span style="width: 10px; height: 10px; background: var(--accent-aws); border-radius: 2px;"></span>
+                <span>My Reservation</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Timeline Container mounted here -->
+          <div id="timeline-mount"></div>
+
+          <div style="margin-top: 18px; display: flex; align-items: center; justify-content: space-between; font-size: 0.8125rem; color: var(--text-secondary);">
+            <span>💡 <strong>Pro Tip:</strong> Click any available green slot directly on the timeline to pre-fill and reserve that time block.</span>
+            <span style="font-family: var(--font-mono); color: var(--accent-aws);">AWS DynamoDB Conditional Write Active</span>
+          </div>
+        </section>
+      </div>
+
+      <!-- TAB VIEW 2: AVAILABILITY (Full view) -->
+      <div id="tab-section-availability" class="dashboard-view-section">
+        <div class="card" style="margin-bottom: 24px;">
+          <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 8px;">Campus Availability Matrix</h2>
+          <p style="color: var(--text-secondary); margin-bottom: 20px;">Real-time availability status across all certified campus venues for Friday, September 11.</p>
+          <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+            <button class="btn btn-primary btn-sm resource-switch-btn" data-resource-id="innovation-lab">Innovation Lab (Block A)</button>
+            <button class="btn btn-secondary btn-sm resource-switch-btn" data-resource-id="robotics-arena">Robotics Arena (Block C)</button>
+            <button class="btn btn-secondary btn-sm resource-switch-btn" data-resource-id="seminar-hall-b">Seminar Hall B (Block B)</button>
+          </div>
+          <div id="matrix-timeline-info" style="background: rgba(255,153,0,0.05); border: 1px solid var(--border-active); border-radius: var(--radius-md); padding: 14px; font-size: 0.875rem; color: var(--text-secondary);">
+            Showing live availability. Click on any green block in the timeline on the Overview tab or use the Book button to lock in your slot.
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB VIEW 3: CALENDAR -->
+      <div id="tab-section-calendar" class="dashboard-view-section">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 800;">Campus Weekly Calendar</h2>
+              <p style="color: var(--text-secondary);">Week of Sep 07 – Sep 12, 2026</p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="window.campusFlowApp.bookingModal.open()">+ New Reservation</button>
+          </div>
+          <div id="calendar-grid-mount"></div>
+        </div>
+      </div>
+
+      <!-- TAB VIEW 4: MY BOOKINGS -->
+      <div id="tab-section-bookings" class="dashboard-view-section">
+        <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 4px;">My Active Reservations</h2>
+            <p style="color: var(--text-secondary);">Resources booked under Lakshay Garg (Student · CS & AI).</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="window.campusFlowApp.bookingModal.open()">
+            + Reserve Another Slot
+          </button>
+        </div>
+        <div id="my-bookings-list"></div>
+      </div>
+
+      <!-- TAB VIEW 5: AWS ARCHITECTURE DEEP DIVE -->
+      <div id="tab-section-architecture" class="dashboard-view-section">
+        <div class="card" style="margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+            <div>
+              <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 4px;">AWS Production Cloud Architecture</h2>
+              <p style="color: var(--text-secondary);">How CampusFlow guarantees zero double bookings at university scale.</p>
+            </div>
+            <span class="badge badge-aws">AWS Serverless Reference Architecture</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px;">
+              <h4 style="color: var(--accent-aws); margin-bottom: 12px; font-size: 1rem; font-weight: 700;">DynamoDB Single-Table Schema</h4>
+              <pre style="font-family: var(--font-mono); font-size: 0.75rem; color: #A5B4FC; line-height: 1.6; overflow-x: auto;">
+{
+  "PK": "RESOURCE#INNOVATION_LAB#2026-09-11",
+  "SK": "SLOT#1400_1600",
+  "BookingId": "bk-103",
+  "Team": "AI Society",
+  "BookedBy": "Dr. Sarah Jenkins",
+  "Status": "CONFIRMED",
+  "TTL": 1789171200,
+  "ConditionExpression": "attribute_not_exists(SK)"
+}
+              </pre>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px;">
+              <div style="background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); border-radius: var(--radius-md); padding: 16px;">
+                <strong style="color: var(--status-available); font-size: 0.875rem;">1. Atomic Lock Acquisition</strong>
+                <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 4px;">
+                  Every booking executes with a conditional write on DynamoDB. If two users click submit at the exact same millisecond, only the first request succeeds; the second receives a <code style="color: #FCA5A5;">ConditionalCheckFailedException</code>.
+                </p>
+              </div>
+
+              <div style="background: rgba(255,153,0,0.08); border: 1px solid var(--border-active); border-radius: var(--radius-md); padding: 16px;">
+                <strong style="color: var(--accent-aws); font-size: 0.875rem;">2. WebSocket Real-Time Fanout</strong>
+                <p style="font-size: 0.8125rem; color: var(--text-secondary); margin-top: 4px;">
+                  DynamoDB Streams triggers an AWS Lambda that publishes a mutation message through API Gateway WebSockets, updating all active campus browser timelines within 40ms.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB VIEW 6: ACTIVITY AUDIT LOG -->
+      <div id="tab-section-activity" class="dashboard-view-section">
+        <div class="card">
+          <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 16px;">Live Audit & Ledger Activity</h2>
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.875rem;">
+            <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border-left: 3px solid var(--accent-aws);">
+              <div>
+                <strong>Design Team Sprint</strong> reserved in Innovation Lab (11:00 – 12:00)
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Booked by Lakshay Garg · Verified via DynamoDB Lock</div>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-aws);">11:02 AM</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border-left: 3px solid var(--status-booked);">
+              <div>
+                <strong>AI Society</strong> reserved in Innovation Lab (14:00 – 16:00)
+                <div style="font-size: 0.75rem; color: var(--text-muted);">Booked by Dr. Sarah Jenkins · Capacity: 28</div>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">09:30 AM</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding: 12px; background: rgba(255,255,255,0.02); border-radius: var(--radius-sm); border-left: 3px solid var(--status-available);">
+              <div>
+                <strong>Robotics Club</strong> checked in at Block A Floor 2 (09:00 – 10:30)
+                <div style="font-size: 0.75rem; color: var(--text-muted);">QR Code scan verified via Campus Gateway</div>
+              </div>
+              <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-muted);">08:58 AM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB VIEW 7: SETTINGS -->
+      <div id="tab-section-settings" class="dashboard-view-section">
+        <div class="card" style="max-width: 600px;">
+          <h2 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 20px;">CampusFlow Settings</h2>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">User Name</label>
+            <input class="form-input" value="Lakshay Garg" readonly>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Campus Email</label>
+            <input class="form-input" value="lakshay.garg@campus.edu" readonly>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">AWS Region Connection</label>
+            <input class="form-input" value="ap-south-1 (Asia Pacific - Mumbai)" readonly>
+          </div>
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label">Appearance & Theme</label>
+            <select id="settings-theme-select" class="form-select">
+              <option value="dark">Dark Theme (Default)</option>
+              <option value="light">Light Theme (High Contrast)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label">Calendar Sync</label>
+            <select class="form-select">
+              <option>Google Calendar (Enabled)</option>
+              <option>Apple Calendar</option>
+              <option>Microsoft Outlook</option>
+            </select>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="window.showToast({ title: 'Settings Saved', message: 'Preferences updated.', type: 'success' })">
+            Save Preferences
+          </button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+
+  <!-- =========================================================================
+       11. BOOKING MODAL & SMART CONFLICT DETECTOR
+       ========================================================================= -->
+  <div id="booking-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+    <div class="modal-container">
+      
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <h3 id="booking-modal-title">Book Innovation Lab</h3>
+          <p id="booking-modal-subtitle">Block A · 2nd Floor · Capacity 40</p>
+        </div>
+        <button class="modal-close-btn" id="btn-close-booking-modal" aria-label="Close modal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Form -->
+      <form id="booking-form">
+        <div class="modal-body">
+          
+          <!-- Date & Time Row -->
+          <div class="form-group">
+            <label class="form-label" for="book-date">Reservation Date</label>
+            <input type="date" id="book-date" class="form-input" value="2026-09-11" required>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="book-start-time">Start Time</label>
+              <input type="time" id="book-start-time" class="form-input" value="12:00" step="1800" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="book-end-time">End Time</label>
+              <input type="time" id="book-end-time" class="form-input" value="13:00" step="1800" required>
+            </div>
+          </div>
+
+          <!-- 12. SMART CONFLICT DETECTION BANNER -->
+          <div id="conflict-banner" class="conflict-banner" role="alert">
+            <div class="conflict-banner-top">
+              <div class="conflict-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              </div>
+              <div class="conflict-content">
+                <div class="conflict-title">
+                  <span>🔴 Time slot unavailable</span>
+                </div>
+                <div class="conflict-message" id="conflict-message">
+                  Innovation Lab is already reserved from 2:00 PM – 4:00 PM.
+                </div>
+              </div>
+            </div>
+
+            <!-- Smart Alternative Suggestions -->
+            <div class="conflict-alternatives-box">
+              <span class="alternatives-label">✨ Smart Alternatives (Click to apply):</span>
+              <div class="alternative-chips" id="alternative-chips">
+                <!-- Injected via JavaScript -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Purpose -->
+          <div class="form-group">
+            <label class="form-label" for="book-purpose">Reservation Purpose</label>
+            <input type="text" id="book-purpose" class="form-input" placeholder="e.g., AI Autonomous Drone Workshop" required>
+          </div>
+
+          <!-- Team / Organization & Participants -->
+          <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="book-team">Team / Organization</label>
+              <input type="text" id="book-team" class="form-input" value="Robotics & AI Guild" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="book-participants">Participants</label>
+              <input type="number" id="book-participants" class="form-input" min="1" max="50" value="15" required>
+            </div>
+          </div>
+
+          <!-- Special Notes -->
+          <div class="form-group">
+            <label class="form-label" for="book-notes">Equipment Requirements / Notes (Optional)</label>
+            <textarea id="book-notes" class="form-textarea" placeholder="e.g., Need 4 soldering stations, high-speed Wi-Fi, and overhead projector."></textarea>
+          </div>
+
+          <!-- AWS Concurrency Guard Indicator -->
+          <div class="aws-guard-note">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="status-dot available"></span>
+              <span>Protected by AWS DynamoDB</span>
+            </div>
+            <code>attribute_not_exists(slotId)</code>
+          </div>
+
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost" id="btn-cancel-booking-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-confirm-booking">
+            Confirm Booking
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+
+  <!-- =========================================================================
+       13. SUCCESS EXPERIENCE MODAL & RECEIPT
+       ========================================================================= -->
+  <div id="success-modal-overlay" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="success-modal-title">
+    <div class="modal-container" style="max-width: 500px;">
+      
+      <div class="success-modal-content">
+        <div class="success-icon-wrapper">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+
+        <div>
+          <h3 class="success-title" id="success-modal-title">Booking Confirmed!</h3>
+          <p class="success-subtitle">
+            Your reservation has been atomically locked into CampusFlow and verified against AWS DynamoDB.
+          </p>
+        </div>
+
+        <!-- AWS Booking Receipt Card -->
+        <div class="booking-receipt-card">
+          <div class="receipt-row">
+            <span class="receipt-label">Resource</span>
+            <span class="receipt-val" id="receipt-resource">Innovation Lab</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Time Window</span>
+            <span class="receipt-val" id="receipt-time">12:00 PM – 1:00 PM</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Date</span>
+            <span class="receipt-val" id="receipt-date">2026-09-11</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">Reservation Ref</span>
+            <span class="receipt-val mono" id="receipt-ref">CF-BK-9281</span>
+          </div>
+          <div class="receipt-row">
+            <span class="receipt-label">AWS Lock Key</span>
+            <span class="receipt-val mono" style="font-size: 0.75rem;" id="receipt-dynamo-key">LOCK#INNOV#1200_1300</span>
+          </div>
+          
+          <div class="aws-conditional-check-badge">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            <span>DynamoDB Atomic Lock Verified (9ms)</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; flex-direction: column; gap: 10px; width: 100%;">
+          <button class="btn btn-primary" id="btn-download-ics" style="width: 100%;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Add to Calendar (.ICS)
+          </button>
+          <button class="btn btn-secondary" id="btn-success-view-bookings" style="width: 100%;">
+            View in My Bookings
+          </button>
+          <button class="btn btn-ghost btn-sm" id="btn-success-close">
+            Done
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Global Toast Notification Container -->
+  <div id="toast-container" aria-live="polite"></div>
+
+  <!-- Application Logic Modules -->
+  <script type="module" src="js/app.js"></script>
+
+</body>
+</html>

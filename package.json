@@ -1,0 +1,10 @@
+{
+  "name": "campusflow",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "One campus. One calendar. Zero double bookings.",
+  "scripts": {
+    "start": "python -m http.server 8080",
+    "test": "node test.js"
+  }
+}
